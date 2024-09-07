@@ -6,7 +6,7 @@ export default async function Home() {
     const imageData: MUImageData[] = await imagesResponse.json();
 
     return (
-        <main className="flex items-center justify-center h-screen">
+        <main className="mx-auto">
             <GameBoard images={imageData} />
         </main>
     );

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { MUImageData } from "@/app/interfaces";
 import { useState } from "react";
+import useLocalStorage from "@/app/hooks/useLocalStorage";
 
 interface GameBoardProps {
     images: MUImageData[]
@@ -18,6 +19,9 @@ export default function GameBoard({ images }: GameBoardProps) {
     const [hits, setHits] = useState(0);
     const [wrongs, setWrongs] = useState(0);
     const [canPlay, setCanPlay] = useState(true); // to avoid click handling when showing a wrong pair
+    
+    const [storedPlayerName, setStoredPlayerName] = useLocalStorage('playername', '');
+    const [playerName, setPlayerName] = useState(storedPlayerName);
 
     const [cards, setCards] = useState(() => {
         const cardsCount = 6 * 3; // cols * rows
@@ -69,7 +73,7 @@ export default function GameBoard({ images }: GameBoardProps) {
             if (card.turnedOver && !card.pairFound) {
                 turnedOverCardsIndex.push(i);
             }
-            
+
             newCards.push(card);
         }
 
@@ -97,16 +101,29 @@ export default function GameBoard({ images }: GameBoardProps) {
 
         setCards(newCards);
     }
+    
+    function changeNameOnClick() {
+        setPlayerName('');
+        setStoredPlayerName(playerName);
+    }
 
     return (
-        <div className="pt-10">
-            <div className="flex justify-center gap-4">
+        <div className="pt-10 w-fit mx-auto">
+            <section>
+                Hola, 
+                <input type="text" className="border-b border-gray-700 text-center md:text-right" value={storedPlayerName}
+                onInput={(ev) => setStoredPlayerName(ev.currentTarget.value) } />
+                <button type="button" onClick={changeNameOnClick}></button>
+                !
+            </section>
+
+            <section className="flex justify-center gap-4">
                 <div>Aciertos: {hits}</div>
                 <div>-</div>
                 <div>Errores: {wrongs}</div>
-            </div>
+            </section>
 
-            <div className="grid grid-cols-3 md:grid-cols-6">
+            <section className="grid grid-cols-3 md:grid-cols-6">
                 {cards.map(({ imageData, turnedOver, pairFound }, i) =>
                     <div
                         key={i}
@@ -116,10 +133,9 @@ export default function GameBoard({ images }: GameBoardProps) {
                     >
                         {turnedOver
                             ? <Image
-                                className="object-cover"
+                                className="object-cover ${}"
                                 src={imageData.url}
                                 alt={imageData.title}
-                                priority
                                 fill
                             />
                             : pairFound
@@ -128,7 +144,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                         }
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 }
