@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { MUImageData } from "@/app/interfaces";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 interface GameBoardProps {
     images: MUImageData[]
@@ -40,7 +40,7 @@ export default function GameBoard({ images }: GameBoardProps) {
         }
 
         // scramble
-        shuffle(cards);
+        shuffleCards(cards);
         return cards;
     });
     
@@ -135,11 +135,11 @@ export default function GameBoard({ images }: GameBoardProps) {
 }
 
 // Fisher–Yates (Knuth) Shuffle
-function shuffle(array: any[]) {
+function shuffleCards(array: Card[]) {
     let currentIndex = array.length;
 
     while (currentIndex != 0) {
-        let randomIndex = Math.floor(Math.random() * currentIndex);
+        const randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
         [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
