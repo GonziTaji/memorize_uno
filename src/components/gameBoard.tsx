@@ -26,6 +26,7 @@ export default function GameBoard({ images }: GameBoardProps) {
             turnedOver: false,
             pairFound: false
         }));
+
         let index: number;
 
         // remove extras
@@ -43,8 +44,6 @@ export default function GameBoard({ images }: GameBoardProps) {
         shuffleCards(cards);
         return cards;
     });
-    
-    console.log(cards);
 
     function cardOnClick(position: number) {
         if (cards[position].turnedOver) {
@@ -100,19 +99,19 @@ export default function GameBoard({ images }: GameBoardProps) {
     }
 
     return (
-        <div>
+        <div className="pt-10">
             <div className="flex justify-center gap-4">
                 <div>Aciertos: {hits}</div>
                 <div>-</div>
                 <div>Errores: {wrongs}</div>
             </div>
 
-            <div className="grid grid-cols-6">
+            <div className="grid grid-cols-3 md:grid-cols-6">
                 {cards.map(({ imageData, turnedOver, pairFound }, i) =>
                     <div
                         key={i}
                         // relative for image fill
-                        className="w-24 h-32 relative m-2 border border-gray-700 flex justify-center items-center bg-gray-100"
+                        className="w-14 h-20 md:w-24 md:h-32 relative m-2 border border-gray-700 flex justify-center items-center bg-gray-100 cursor-pointer"
                         onClick={() => cardOnClick(i)}
                     >
                         {turnedOver
@@ -125,7 +124,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                             />
                             : pairFound
                             ? <div></div>
-                            : <div className="text-7xl">?</div>
+                            : <div className="text-3xl md:text-7xl">?</div>
                         }
                     </div>
                 )}
