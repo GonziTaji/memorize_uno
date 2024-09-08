@@ -151,7 +151,7 @@ export default function GameBoard({ images }: GameBoardProps) {
     // supress because playername comes from localstorage
     const PlayerName = () => <span suppressHydrationWarning>{playerName}</span>;
 
-    return (
+    return ( 
         <div className="mt-10 w-fit mx-auto">
             <section className="p-4">
                 <Flex justify="space-between">
@@ -188,7 +188,13 @@ export default function GameBoard({ images }: GameBoardProps) {
                         <label htmlFor="input_player_name">
                             Ingresa tu nombre
                         </label>
-                        <Input name="input_player_name" type="text" value={newPlayerName} onInput={(ev) => setNewPlayerName(ev.currentTarget.value)} />
+                        <Input
+                            id="input_player_name"
+                            name="input_player_name"
+                            type="text"
+                            value={newPlayerName}
+                            onInput={(ev) => setNewPlayerName(ev.currentTarget.value)}
+                        />
                     </div>
                 </Space>
             </Modal>

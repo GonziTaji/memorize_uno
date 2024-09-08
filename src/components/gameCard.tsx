@@ -33,6 +33,7 @@ export default function GameCard({ canPlay, card, cardOnClick }: GameCardProps) 
                     style={{ visibility: card.turnedOver ? 'visible' : 'hidden'}}
                     src={card.imageData.url}
                     alt={card.imageData.title}
+                    title={card.imageData.title}
                     fill
                 />
                 : <div className="text-3xl md:text-7xl" style={{ visibility: card.turnedOver ? 'hidden': 'visible' }}>
