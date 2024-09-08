@@ -1,6 +1,5 @@
 'use client'
 
-import Image from "next/image";
 import { CardData, MUImageData } from "@/app/interfaces";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -19,7 +18,7 @@ export default function GameBoard({ images }: GameBoardProps) {
     const [canPlay, setCanPlay] = useState(true); // to avoid click handling when showing a wrong pair
 
     const [playerName, setPlayerName] = useLocalStorage(PLAYERNAME_KEY, '');
-    const [newPlayerName, setNewPlayerName] = useState('');
+    const [newPlayerName, setNewPlayerName] = useState(playerName);
     const [isPlayerNameModalOpen, setIsPlayerNameModalOpen] = useState(false);
     const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
     const [cards, setCards] = useState(getCardSetFromImages());
@@ -27,7 +26,6 @@ export default function GameBoard({ images }: GameBoardProps) {
     useEffect(() => {
         // avoid hidration error doing this here instead of using default values
         setIsPlayerNameModalOpen(true);
-        setNewPlayerName(playerName);
     }, []);
 
     function getCardSetFromImages() {
@@ -138,14 +136,6 @@ export default function GameBoard({ images }: GameBoardProps) {
         }
 
         setIsPlayerNameModalOpen(false);
-    }
-
-    function getCardCursor(card: CardData) {
-        if (canPlay && !card.pairFound && !card.turnedOver) {
-            return 'cursor-pointer';
-        }
-
-        return '';
     }
 
     // supress because playername comes from localstorage
