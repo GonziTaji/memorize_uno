@@ -23,8 +23,8 @@ export default function GameBoard({ images }: GameBoardProps) {
 
     const [storedPlayerName, setStoredPlayerName] = useLocalStorage('playername', '');
     const [playerName, setPlayerName] = useState(storedPlayerName);
-    const [isPlayerNameModalOpen, setIsPlayerNameModalOpen] = useState(false);
-    const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(true);
+    const [isPlayerNameModalOpen, setIsPlayerNameModalOpen] = useState(true);
+    const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
 
     const [cards, setCards] = useState(getCardSetFromImages());
 
