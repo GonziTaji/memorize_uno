@@ -1,10 +1,10 @@
 'use client'
 
+import Image from "next/image";
 import { Card, MUImageData } from "@/app/interfaces";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Flex, Input, Modal, Space } from "antd";
-import GameCard from "./gameCard";
 
 interface GameBoardProps {
     images: MUImageData[]
@@ -85,6 +85,7 @@ export default function GameBoard({ images }: GameBoardProps) {
 
         if (turnedOverCardsIndex.length === 2) {
             // check equality
+            console.log(newCards[turnedOverCardsIndex[0]].imageData, newCards[turnedOverCardsIndex[1]].imageData);
             if (newCards[turnedOverCardsIndex[0]].imageData.uuid === newCards[turnedOverCardsIndex[1]].imageData.uuid) {
                 newCards[turnedOverCardsIndex[0]].pairFound = true;
                 newCards[turnedOverCardsIndex[1]].pairFound = true;
@@ -128,21 +129,29 @@ export default function GameBoard({ images }: GameBoardProps) {
         setCards(getCardSetFromImages());
         setIsGameOverModalOpen(false);
     }
-    
+
     function playerNameModalCancel() {
         if (!playerName) {
             alert('Debes agregar un nombre para comenzar a jugar');
             return;
         }
-        
+
         setIsPlayerNameModalOpen(false);
     }
-    
+
+    function getCardCursor(card: Card) {
+        if (canPlay && !card.pairFound && !card.turnedOver) {
+            return 'cursor-pointer';
+        }
+
+        return '';
+    }
+
     // supress because playername comes from localstorage
     const PlayerName = () => <span suppressHydrationWarning>{playerName}</span>;
 
     return (
-        <div className="pt-10 w-fit mx-auto">
+        <div className="mt-10 w-fit mx-auto">
             <section>
                 <p>Jugando: <PlayerName /></p>
                 <Flex gap="middle" justify="center">
@@ -154,7 +163,29 @@ export default function GameBoard({ images }: GameBoardProps) {
 
             <section className="grid grid-cols-3 md:grid-cols-6">
                 {cards.map((card, i) =>
-                    <GameCard key={i} card={card} canPlay={canPlay} cardOnClick={() => cardOnClick(i)} />
+                    <div key={i}
+                        // relative for image fill
+                        className={`
+                            relative w-14 h-20 md:w-24 md:h-32 m-2 
+                            border border-gray-700 rounded-md bg-violet-100
+                            flex justify-center items-center
+                            ${getCardCursor(card)}`}
+                        onClick={() => cardOnClick(i)}
+                    >
+                        <Image
+                            className="object-cover"
+                            style={{ visibility: card.turnedOver ? 'visible' : 'hidden' }}
+                            src={card.imageData.url}
+                            alt={card.imageData.title}
+                            fill
+                        />
+                        <div
+                            className="text-3xl md:text-7xl"
+                            style={{ visibility: card.turnedOver ? 'hidden' : 'visible' }}
+                        >
+                            ?
+                        </div>
+                    </div>
                 )}
             </section>
 
@@ -180,7 +211,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                     </div>
                 </Space>
             </Modal>
-            
+
             <Modal
                 title="Fin del juego"
                 open={isGameOverModalOpen}
