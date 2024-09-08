@@ -5,6 +5,7 @@ import { Card, MUImageData } from "@/app/interfaces";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Flex, Input, Modal, Space } from "antd";
+import GameCard from "./gameCard";
 
 interface GameBoardProps {
     images: MUImageData[]
@@ -163,29 +164,7 @@ export default function GameBoard({ images }: GameBoardProps) {
 
             <section className="grid grid-cols-3 md:grid-cols-6">
                 {cards.map((card, i) =>
-                    <div key={i}
-                        // relative for image fill
-                        className={`
-                            relative w-14 h-20 md:w-24 md:h-32 m-2 
-                            border border-gray-700 rounded-md bg-violet-100
-                            flex justify-center items-center
-                            ${getCardCursor(card)}`}
-                        onClick={() => cardOnClick(i)}
-                    >
-                        <Image
-                            className="object-cover"
-                            style={{ visibility: card.turnedOver ? 'visible' : 'hidden' }}
-                            src={card.imageData.url}
-                            alt={card.imageData.title}
-                            fill
-                        />
-                        <div
-                            className="text-3xl md:text-7xl"
-                            style={{ visibility: card.turnedOver ? 'hidden' : 'visible' }}
-                        >
-                            ?
-                        </div>
-                    </div>
+                    <GameCard key={i} canPlay={canPlay} card={card} cardOnClick={() => cardOnClick(i)} />
                 )}
             </section>
 

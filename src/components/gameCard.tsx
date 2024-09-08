@@ -22,7 +22,7 @@ export default function GameCard({ canPlay, card, cardOnClick }: GameCardProps) 
             // relative for image fill
             className={`
                 relative w-14 h-20 md:w-24 md:h-32 m-2 
-                border border-gray-700 bg-violet-100
+                border-2 border-gray-700 rounded-md bg-violet-100
                 flex justify-center items-center
                 ${getCardCursor(card)}`}
             onClick={cardOnClick}
