@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { MUImageData } from "@/app/interfaces";
 import { useState } from "react";
-import useLocalStorage from "@/app/hooks/useLocalStorage";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface GameBoardProps {
     images: MUImageData[]
@@ -19,7 +19,7 @@ export default function GameBoard({ images }: GameBoardProps) {
     const [hits, setHits] = useState(0);
     const [wrongs, setWrongs] = useState(0);
     const [canPlay, setCanPlay] = useState(true); // to avoid click handling when showing a wrong pair
-    
+
     const [storedPlayerName, setStoredPlayerName] = useLocalStorage('playername', '');
     const [playerName, setPlayerName] = useState(storedPlayerName);
 
@@ -54,7 +54,7 @@ export default function GameBoard({ images }: GameBoardProps) {
             console.log('Already turned over. Ignoring selection');
             return;
         }
-        
+
         if (!canPlay) {
             console.log('Cannot play. Ignoring selection');
             return;
@@ -64,8 +64,8 @@ export default function GameBoard({ images }: GameBoardProps) {
         const newCards: Card[] = [];
 
         for (let i = 0; i < cards.length; i++) {
-            const card = {...cards[i]};
-            
+            const card = { ...cards[i] };
+
             if (i === position) {
                 card.turnedOver = true;
             }
@@ -82,10 +82,10 @@ export default function GameBoard({ images }: GameBoardProps) {
             if (newCards[turnedOverCardsIndex[0]].imageData.uuid === newCards[turnedOverCardsIndex[1]].imageData.uuid) {
                 newCards[turnedOverCardsIndex[0]].pairFound = true;
                 newCards[turnedOverCardsIndex[1]].pairFound = true;
-                
-                setHits(hits+1);
+
+                setHits(hits + 1);
             } else {
-                setWrongs(wrongs+1);
+                setWrongs(wrongs + 1);
                 setCanPlay(false);
 
                 setTimeout(() => {
@@ -93,7 +93,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                         ...c,
                         turnedOver: c.pairFound ? true : false
                     })));
-                    
+
                     setCanPlay(true);
                 }, 700);
             }
@@ -101,22 +101,22 @@ export default function GameBoard({ images }: GameBoardProps) {
 
         setCards(newCards);
     }
-    
+
     function changeNameOnClick() {
-        setPlayerName('');
         setStoredPlayerName(playerName);
+        setPlayerName(playerName);
+    }
+
+    function getCardCursor(card: Card) {
+        if (canPlay && !card.pairFound && !card.turnedOver) {
+            return 'cursor-pointer';
+        }
+
+        return '';
     }
 
     return (
         <div className="pt-10 w-fit mx-auto">
-            <section>
-                Hola, 
-                <input type="text" className="border-b border-gray-700 text-center md:text-right" value={storedPlayerName}
-                onInput={(ev) => setStoredPlayerName(ev.currentTarget.value) } />
-                <button type="button" onClick={changeNameOnClick}></button>
-                !
-            </section>
-
             <section className="flex justify-center gap-4">
                 <div>Aciertos: {hits}</div>
                 <div>-</div>
@@ -124,27 +124,56 @@ export default function GameBoard({ images }: GameBoardProps) {
             </section>
 
             <section className="grid grid-cols-3 md:grid-cols-6">
-                {cards.map(({ imageData, turnedOver, pairFound }, i) =>
+                {cards.map((card, i) =>
                     <div
                         key={i}
                         // relative for image fill
-                        className="w-14 h-20 md:w-24 md:h-32 relative m-2 border border-gray-700 flex justify-center items-center bg-gray-100 cursor-pointer"
+                        className={`
+                            relative w-14 h-20 md:w-24 md:h-32 m-2 
+                            border border-gray-700 bg-violet-100
+                            flex justify-center items-center
+                            ${getCardCursor(card)}`}
                         onClick={() => cardOnClick(i)}
                     >
-                        {turnedOver
+                        {card.turnedOver
                             ? <Image
-                                className="object-cover ${}"
-                                src={imageData.url}
-                                alt={imageData.title}
+                                className="object-cover"
+                                src={card.imageData.url}
+                                alt={card.imageData.title}
                                 fill
                             />
-                            : pairFound
-                            ? <div></div>
                             : <div className="text-3xl md:text-7xl">?</div>
                         }
                     </div>
                 )}
             </section>
+
+            <div id="modal_username" className="modal_overlay">
+                <div className="modal">
+                    <h1 className="text-xl">
+                        Bienvenid@ {storedPlayerName || 'Invitado'}!
+                    </h1>
+
+                    <div className="block">
+                        <label htmlFor="input_player_name">
+                            {storedPlayerName ? 'Ingresa tu nombre' : 'Cambiar de nombre'}
+                        </label>
+                        <input
+                            id="input_player_name"
+                            type="text"
+                            className="border-b border-gray-700 text-center md:text-right w-32"
+                            value={playerName}
+                            onInput={(ev) => setPlayerName(ev.currentTarget.value)} />
+                        <button
+                            type="button"
+                            className="rounded-md bg-cyan-500 text-white font-bold px-4 py-2"
+                            onClick={changeNameOnClick}
+                        >
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
