@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { MUImageData } from "@/app/interfaces";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Flex, Input, Modal, Space } from "antd";
 
@@ -16,17 +16,24 @@ interface Card {
     pairFound: boolean,
 }
 
+const PLAYERNAME_KEY = 'playername';
+
 export default function GameBoard({ images }: GameBoardProps) {
     const [hits, setHits] = useState(0);
     const [wrongs, setWrongs] = useState(0);
     const [canPlay, setCanPlay] = useState(true); // to avoid click handling when showing a wrong pair
 
-    const [storedPlayerName, setStoredPlayerName] = useLocalStorage('playername', '');
-    const [playerName, setPlayerName] = useState(storedPlayerName);
-    const [isPlayerNameModalOpen, setIsPlayerNameModalOpen] = useState(true);
+    const [playerName, setPlayerName] = useLocalStorage(PLAYERNAME_KEY, '');
+    const [newPlayerName, setNewPlayerName] = useState('');
+    const [isPlayerNameModalOpen, setIsPlayerNameModalOpen] = useState(false);
     const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
-
     const [cards, setCards] = useState(getCardSetFromImages());
+
+    useEffect(() => {
+        // avoid hidration error doing this here instead of using default values
+        setIsPlayerNameModalOpen(true);
+        setNewPlayerName(playerName);
+    }, []);
 
     function getCardSetFromImages() {
         const cardsCount = 6 * 3; // cols * rows
@@ -112,8 +119,12 @@ export default function GameBoard({ images }: GameBoardProps) {
     }
 
     function changeNameOnClick() {
-        setStoredPlayerName(playerName);
-        setPlayerName(playerName);
+        if (!newPlayerName) {
+            alert('Debes agregar un nombre para comenzar a jugar');
+            return;
+        }
+
+        setPlayerName(newPlayerName);
         setIsPlayerNameModalOpen(false);
     }
 
@@ -131,10 +142,23 @@ export default function GameBoard({ images }: GameBoardProps) {
 
         return '';
     }
+
+    function playerNameModalCancel() {
+        if (!playerName) {
+            alert('Debes agregar un nombre para comenzar a jugar');
+            return;
+        }
+        
+        setIsPlayerNameModalOpen(false);
+    }
     
+    // supress because playername comes from localstorage
+    const PlayerName = () => <span suppressHydrationWarning>{playerName}</span>;
+
     return (
         <div className="pt-10 w-fit mx-auto">
             <section>
+                <p>Jugando: <PlayerName /></p>
                 <Flex gap="middle" justify="center">
                     <span>Aciertos: {hits}</span>
                     <span>-</span>
@@ -170,6 +194,7 @@ export default function GameBoard({ images }: GameBoardProps) {
             <Modal
                 title="Memorize Uno!"
                 open={isPlayerNameModalOpen}
+                onCancel={playerNameModalCancel}
                 footer={[
                     <Button key={0} type="primary" onClick={changeNameOnClick}>Continuar</Button>
                 ]}
@@ -177,14 +202,14 @@ export default function GameBoard({ images }: GameBoardProps) {
 
                 <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
                     <h1 className="text-xl">
-                        Bienvenid@ {storedPlayerName || 'Invitado'}!
+                        Bienvenid@!
                     </h1>
 
                     <div className="block pt">
                         <label htmlFor="input_player_name">
-                            {storedPlayerName ? 'Cambiar de nombre' : 'Ingresa tu nombre'}
+                            Ingresa tu nombre
                         </label>
-                        <Input name="input_player_name" type="text" value={playerName} onInput={(ev) => setPlayerName(ev.currentTarget.value)} />
+                        <Input name="input_player_name" type="text" value={newPlayerName} onInput={(ev) => setNewPlayerName(ev.currentTarget.value)} />
                     </div>
                 </Space>
             </Modal>
@@ -204,7 +229,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                         Juntaste todos los pares con solo {wrongs} equivocaciones.
                     </p>
                 </Space>
-                </Modal>
+            </Modal>
         </div>
     );
 }
