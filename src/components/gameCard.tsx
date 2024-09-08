@@ -1,14 +1,14 @@
 import Image from "next/image";
-import { Card } from "@/app/interfaces";
+import { CardData } from "@/app/interfaces";
 
 interface GameCardProps {
     cardOnClick: () => void
     canPlay: boolean;
-    card: Card;
+    card: CardData;
 }
 
 export default function GameCard({ canPlay, card, cardOnClick }: GameCardProps) {
-    function getCardCursor(card: Card) {
+    function getCardCursor(card: CardData) {
         if (canPlay && !card.pairFound && !card.turnedOver) {
             return 'cursor-pointer';
         }

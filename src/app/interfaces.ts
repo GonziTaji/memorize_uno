@@ -6,7 +6,7 @@ export interface MUImageData {
     content_type: string;
 }
 
-export interface Card {
+export interface CardData {
     imageData: MUImageData,
     turnedOver: boolean,
     pairFound: boolean,

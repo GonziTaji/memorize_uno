@@ -1,7 +1,7 @@
 'use client'
 
 import Image from "next/image";
-import { Card, MUImageData } from "@/app/interfaces";
+import { CardData, MUImageData } from "@/app/interfaces";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Flex, Input, Modal, Space } from "antd";
@@ -32,7 +32,7 @@ export default function GameBoard({ images }: GameBoardProps) {
 
     function getCardSetFromImages() {
         const cardsCount = 6 * 3; // cols * rows
-        const cards: Card[] = images.map(img => ({
+        const cards: CardData[] = images.map(img => ({
             imageData: img,
             turnedOver: false,
             pairFound: false
@@ -68,7 +68,7 @@ export default function GameBoard({ images }: GameBoardProps) {
         }
 
         const turnedOverCardsIndex = []
-        const newCards: Card[] = [];
+        const newCards: CardData[] = [];
 
         for (let i = 0; i < cards.length; i++) {
             const card = { ...cards[i] };
@@ -140,7 +140,7 @@ export default function GameBoard({ images }: GameBoardProps) {
         setIsPlayerNameModalOpen(false);
     }
 
-    function getCardCursor(card: Card) {
+    function getCardCursor(card: CardData) {
         if (canPlay && !card.pairFound && !card.turnedOver) {
             return 'cursor-pointer';
         }
@@ -153,16 +153,18 @@ export default function GameBoard({ images }: GameBoardProps) {
 
     return (
         <div className="mt-10 w-fit mx-auto">
-            <section>
-                <p>Jugando: <PlayerName /></p>
-                <Flex gap="middle" justify="center">
-                    <span>Aciertos: {hits}</span>
-                    <span>-</span>
-                    <span>Equivocaciones: {wrongs}</span>
+            <section className="p-4">
+                <Flex justify="space-between">
+                    <p>Jugando: <PlayerName /></p>
+                    <Flex gap="middle" justify="center">
+                        <span>Aciertos: {hits}</span>
+                        <span>-</span>
+                        <span>Equivocaciones: {wrongs}</span>
+                    </Flex>
                 </Flex>
             </section>
 
-            <section className="grid grid-cols-3 md:grid-cols-6">
+            <section className="grid grid-cols-3 md:grid-cols-6 border border-gray-500 rounded-md bg-gray-100 p-4 gap-4">
                 {cards.map((card, i) =>
                     <GameCard key={i} canPlay={canPlay} card={card} cardOnClick={() => cardOnClick(i)} />
                 )}
@@ -212,7 +214,7 @@ export default function GameBoard({ images }: GameBoardProps) {
 }
 
 // Fisher–Yates (Knuth) Shuffle
-function shuffleCards(array: Card[]) {
+function shuffleCards(array: CardData[]) {
     let currentIndex = array.length;
 
     while (currentIndex != 0) {
