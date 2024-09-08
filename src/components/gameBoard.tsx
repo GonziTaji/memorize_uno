@@ -171,7 +171,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                 title="Memorize Uno!"
                 open={isPlayerNameModalOpen}
                 footer={[
-                    <Button type="primary" onClick={changeNameOnClick}>Continuar</Button>
+                    <Button key={0} type="primary" onClick={changeNameOnClick}>Continuar</Button>
                 ]}
             >
 
@@ -193,7 +193,7 @@ export default function GameBoard({ images }: GameBoardProps) {
                 title="Fin del juego"
                 open={isGameOverModalOpen}
                 footer={[
-                    <Button type="primary" onClick={playAgainOnClick}>Jugar de nuevo</Button>
+                    <Button key={0} type="primary" onClick={playAgainOnClick}>Jugar de nuevo</Button>
                 ]}
             >
                 <Space direction="vertical">
