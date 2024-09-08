@@ -1,19 +1,13 @@
 'use client'
 
-import Image from "next/image";
-import { MUImageData } from "@/app/interfaces";
+import { Card, MUImageData } from "@/app/interfaces";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Flex, Input, Modal, Space } from "antd";
+import GameCard from "./gameCard";
 
 interface GameBoardProps {
     images: MUImageData[]
-}
-
-interface Card {
-    imageData: MUImageData,
-    turnedOver: boolean,
-    pairFound: boolean,
 }
 
 const PLAYERNAME_KEY = 'playername';
@@ -135,14 +129,6 @@ export default function GameBoard({ images }: GameBoardProps) {
         setIsGameOverModalOpen(false);
     }
     
-    function getCardCursor(card: Card) {
-        if (canPlay && !card.pairFound && !card.turnedOver) {
-            return 'cursor-pointer';
-        }
-
-        return '';
-    }
-
     function playerNameModalCancel() {
         if (!playerName) {
             alert('Debes agregar un nombre para comenzar a jugar');
@@ -168,26 +154,7 @@ export default function GameBoard({ images }: GameBoardProps) {
 
             <section className="grid grid-cols-3 md:grid-cols-6">
                 {cards.map((card, i) =>
-                    <div
-                        key={i}
-                        // relative for image fill
-                        className={`
-                            relative w-14 h-20 md:w-24 md:h-32 m-2 
-                            border border-gray-700 bg-violet-100
-                            flex justify-center items-center
-                            ${getCardCursor(card)}`}
-                        onClick={() => cardOnClick(i)}
-                    >
-                        {card.turnedOver
-                            ? <Image
-                                className="object-cover"
-                                src={card.imageData.url}
-                                alt={card.imageData.title}
-                                fill
-                            />
-                            : <div className="text-3xl md:text-7xl">?</div>
-                        }
-                    </div>
+                    <GameCard key={i} card={card} canPlay={canPlay} cardOnClick={() => cardOnClick(i)} />
                 )}
             </section>
 
