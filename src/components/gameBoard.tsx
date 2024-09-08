@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MUImageData } from "@/app/interfaces";
 import { useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { Button, Flex, Input, Modal, Space } from "antd";
 
 interface GameBoardProps {
     images: MUImageData[]
@@ -22,8 +23,12 @@ export default function GameBoard({ images }: GameBoardProps) {
 
     const [storedPlayerName, setStoredPlayerName] = useLocalStorage('playername', '');
     const [playerName, setPlayerName] = useState(storedPlayerName);
+    const [isPlayerNameModalOpen, setIsPlayerNameModalOpen] = useState(false);
+    const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(true);
 
-    const [cards, setCards] = useState(() => {
+    const [cards, setCards] = useState(getCardSetFromImages());
+
+    function getCardSetFromImages() {
         const cardsCount = 6 * 3; // cols * rows
         const cards: Card[] = images.map(img => ({
             imageData: img,
@@ -47,7 +52,7 @@ export default function GameBoard({ images }: GameBoardProps) {
         // scramble
         shuffleCards(cards);
         return cards;
-    });
+    }
 
     function cardOnClick(position: number) {
         if (cards[position].turnedOver) {
@@ -84,6 +89,10 @@ export default function GameBoard({ images }: GameBoardProps) {
                 newCards[turnedOverCardsIndex[1]].pairFound = true;
 
                 setHits(hits + 1);
+
+                if (newCards.filter(c => c.pairFound).length === newCards.length) {
+                    setIsGameOverModalOpen(true);
+                }
             } else {
                 setWrongs(wrongs + 1);
                 setCanPlay(false);
@@ -105,8 +114,16 @@ export default function GameBoard({ images }: GameBoardProps) {
     function changeNameOnClick() {
         setStoredPlayerName(playerName);
         setPlayerName(playerName);
+        setIsPlayerNameModalOpen(false);
     }
 
+    function playAgainOnClick() {
+        setWrongs(0);
+        setHits(0);
+        setCards(getCardSetFromImages());
+        setIsGameOverModalOpen(false);
+    }
+    
     function getCardCursor(card: Card) {
         if (canPlay && !card.pairFound && !card.turnedOver) {
             return 'cursor-pointer';
@@ -114,13 +131,15 @@ export default function GameBoard({ images }: GameBoardProps) {
 
         return '';
     }
-
+    
     return (
         <div className="pt-10 w-fit mx-auto">
-            <section className="flex justify-center gap-4">
-                <div>Aciertos: {hits}</div>
-                <div>-</div>
-                <div>Errores: {wrongs}</div>
+            <section>
+                <Flex gap="middle" justify="center">
+                    <span>Aciertos: {hits}</span>
+                    <span>-</span>
+                    <span>Equivocaciones: {wrongs}</span>
+                </Flex>
             </section>
 
             <section className="grid grid-cols-3 md:grid-cols-6">
@@ -148,32 +167,44 @@ export default function GameBoard({ images }: GameBoardProps) {
                 )}
             </section>
 
-            <div id="modal_username" className="modal_overlay">
-                <div className="modal">
+            <Modal
+                title="Memorize Uno!"
+                open={isPlayerNameModalOpen}
+                footer={[
+                    <Button type="primary" onClick={changeNameOnClick}>Continuar</Button>
+                ]}
+            >
+
+                <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
                     <h1 className="text-xl">
                         Bienvenid@ {storedPlayerName || 'Invitado'}!
                     </h1>
 
-                    <div className="block">
+                    <div className="block pt">
                         <label htmlFor="input_player_name">
-                            {storedPlayerName ? 'Ingresa tu nombre' : 'Cambiar de nombre'}
+                            {storedPlayerName ? 'Cambiar de nombre' : 'Ingresa tu nombre'}
                         </label>
-                        <input
-                            id="input_player_name"
-                            type="text"
-                            className="border-b border-gray-700 text-center md:text-right w-32"
-                            value={playerName}
-                            onInput={(ev) => setPlayerName(ev.currentTarget.value)} />
-                        <button
-                            type="button"
-                            className="rounded-md bg-cyan-500 text-white font-bold px-4 py-2"
-                            onClick={changeNameOnClick}
-                        >
-                            Guardar
-                        </button>
+                        <Input name="input_player_name" type="text" value={playerName} onInput={(ev) => setPlayerName(ev.currentTarget.value)} />
                     </div>
-                </div>
-            </div>
+                </Space>
+            </Modal>
+            
+            <Modal
+                title="Fin del juego"
+                open={isGameOverModalOpen}
+                footer={[
+                    <Button type="primary" onClick={playAgainOnClick}>Jugar de nuevo</Button>
+                ]}
+            >
+                <Space direction="vertical">
+                    <p>
+                        Has ganado, {playerName}!
+                    </p>
+                    <p>
+                        Juntaste todos los pares con solo {wrongs} equivocaciones.
+                    </p>
+                </Space>
+                </Modal>
         </div>
     );
 }
